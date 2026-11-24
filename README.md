@@ -1,8 +1,9 @@
-# Скрипты работы с файлами (используя awk.exe). 
+# Скрипты работы с файлами (используя awk.exe).
 
 # addfile
 Склейка двух текстовых файлов в один с сохранением переводов строк.
-Использование: awk-f addfile.awk one two [outfile]
+Использование: `addfile one two [outfile]`
+`awk-f addfile.awk one two [outfile]`
 Кодировка сохраняется по первому файлу (побайтовое копирование)
 
 ## Параметры:
@@ -12,16 +13,17 @@
 
 ## Примеры:
 * Склейка двух файлов (добавить two.txt в конец one.txt)
-awk-f addfile.awk one.txt two.txt
+`addfile one.txt two.txt`
 
 * Склейка с записью в новый файл
-awk-f addfile.awk one.txt two.txt result.txt
+`addfile one.txt two.txt result.txt`
 
 ---
 
 # addline
 Добавление строки с переводом строки в конец файла.
-Использование: awk-f addline.awk infile string [outfile]
+Использование: `addline infile string [outfile]`
+`awk-f addline.awk infile string [outfile]`
 
 ## Параметры:
 - infile — исходный файл
@@ -30,17 +32,18 @@ awk-f addfile.awk one.txt two.txt result.txt
 
 ## Примеры:
 * Добавить строку "новая строка" в конец файла (с переводом строки)
-awk-f addline.awk file.txt "новая строка"
+`addline file.txt "новая строка"`
 
 * Добавить пустую строку (просто перевод строки)
-awk-f addline.awk file.txt ""
+`addline file.txt ""`
 
 ---
 
 # addtxt
 Добавление текста в конец файла БЕЗ перевода строки.
 Текст приклеивается к последнему символу файла.
-Использование: awk-f addtxt.awk infile text [outfile]
+Использование: `addtxt infile text [outfile]`
+`awk-f addtxt.awk infile text [outfile]`
 
 ## Параметры:
 - infile — исходный файл
@@ -49,16 +52,16 @@ awk-f addline.awk file.txt ""
 
 ## Примеры:
 * Добавить текст "XXX" в конец файла без перевода строки
-awk-f addtxt.awk file.txt "XXX"
+`addtxt file.txt "XXX"`
 
 * Добавить текст и записать в новый файл
-awk-f addtxt.awk file.txt "XXX" output.txt
+`addtxt file.txt "XXX" output.txt`
 
 ---
 
 # cf
 Cоздание пустого файла с заданным именем.
-Использование: `cf.bat file`
+Использование: `cf file`
 
 ## Параметры:
 - `file` - имя создаваемого файла.
@@ -67,7 +70,8 @@ Cоздание пустого файла с заданным именем.
 
 # delline
 Удаление одной или нескольких строк из файла
-Использование: awk-f delline.awk start [end] file.txt [outfile.txt]
+Использование: `delline start [end] file.txt [outfile.txt]`
+`awk-f delline.awk start [end] file.txt [outfile.txt]`
 
 ## Параметры:
 - start — начальный номер строки (от 1)
@@ -79,7 +83,8 @@ Cоздание пустого файла с заданным именем.
 
 # find-line
 Поиск подстроки в файле с выводом содержащих её строк целиком.
-Использование: awk-f find-line.awk string file.txt
+Использование: `find-line string file.txt`
+`awk-f find-line.awk string file.txt`
 Вывод: номер_строки:вся_строка
 
 ## Параметры:
@@ -90,7 +95,8 @@ Cоздание пустого файла с заданным именем.
 
 # find-ln
 Поиск подстроки в файле с выводом номеров строк, где она найдена. 
-Использование: ./awk-f find-ln.awk string file.txt
+Использование: `find-ln string file.txt`
+`awk-f find-ln.awk string file.txt`
 
 ## Параметры:
 - string — искомая подстрока (если содержит пробелы, заключайте её в кавычки)
@@ -100,7 +106,8 @@ Cоздание пустого файла с заданным именем.
 
 # find-pos
 Поиск подстроки в файле с выводом мест(строка:позиции), где она найдена. 
-Использование: awk-f find-pos.awk string file.txt
+Использование: `find-pos string file.txt`
+`awk-f find-pos.awk string file.txt`
 Вывод: номер_строки:позиция1,позиция2,...
 
 ## Параметры:
@@ -111,7 +118,8 @@ Cоздание пустого файла с заданным именем.
 
 # getline
 Вывод диапазона строк из файла в консоль.
-Использование: awk-f getline.awk start [end] file.txt
+Использование: `getline start [end] file.txt`
+`awk-f getline.awk start [end] file.txt`
 
 ## Параметры:
 - start — начальный номер строки (от 1)
@@ -122,7 +130,8 @@ Cоздание пустого файла с заданным именем.
 
 # insline
 Вставка строки файл
-Использование: awk-f insline.awk line_num text file.txt [outfile]
+Использование: `insline line_num text file.txt [outfile]`
+`awk-f insline.awk line_num text file.txt [outfile]`
 Вставляет text как новую строку ПЕРЕД строкой с номером line_num
 *Вставка в конец — если line_num превышает количество строк, блок добавляется в конец файла.
 
@@ -136,7 +145,8 @@ Cоздание пустого файла с заданным именем.
 
 # inslines
 Вставка многострочного блока в файл
-Использование: `awk-f inslines.awk line_num block.txt file.txt [outfile]`
+Использование: `inslines line_num block.txt file.txt [outfile]`
+`awk-f inslines.awk line_num block.txt file.txt [outfile]`
 Вставляет содержимое block.txt как новые строки ПЕРЕД строкой с номером line_num
 *Вставка в конец — если line_num превышает количество строк, блок добавляется в конец файла.
 
@@ -148,22 +158,23 @@ Cоздание пустого файла с заданным именем.
 
 ## Примеры:
 * Вставить блок из block.txt перед строкой 5
-`awk-f insblock.awk 5 block.txt file.txt`
+`insblock 5 block.txt file.txt`
 
 * Вставить блок перед строкой 5 и записать в output.txt
-`awk-f insblock.awk 5 block.txt file.txt output.txt`
+`insblock 5 block.txt file.txt output.txt`
 
 * Добавить блок в конец файла (номер строки больше, чем есть в файле)
-`awk-f insblock.awk 1000 block.txt file.txt`
+`insblock 1000 block.txt file.txt`
 
 * Добавить блок в самое начало файла (перед строкой 1)
-`awk-f insblock.awk 1 block.txt file.txt`
+`insblock 1 block.txt file.txt`
 
 ---
 
 # instxt
 Вставка текста в строку
-Использование: `awk-f instxt.awk line_num pos text file.txt [outfile]`
+Использование: `instxt line_num pos text file.txt [outfile]`
+`awk-f instxt.awk line_num pos text file.txt [outfile]`
 Вставляет text ВНУТРЬ строки line_num на позицию pos (символы сдвигаются). Если pos больше длины строки — вставка в конец строки
 
 ## Параметры:
@@ -177,11 +188,10 @@ Cоздание пустого файла с заданным именем.
 
 # replace
 Поиск и замена подстроки в файле (однострочная) с опциональным указанием диапазона строк в файле для поиска и замены.
-Использование без диапазона: `awk-f.bat replace.awk old new file.txt [outfile.txt]`
-Использование с диапазоном: `awk-f.bat replace.awk old new start [end] file.txt [outfile.txt]`
-Через обертку replace.bat:
-`replace old new file.txt [outfile.txt]`
-`replace old new start [end] file.txt [outfile.txt]`
+Использование без диапазона: `replace old new file.txt [outfile.txt]`
+`awk-f.bat replace.awk old new file.txt [outfile.txt]`
+Использование с диапазоном: `replace old new start [end] file.txt [outfile.txt]`
+`awk-f.bat replace.awk old new start [end] file.txt [outfile.txt]`
 
 ## Параметры:
 - `old` — что заменить (если содержит пробелы, заключайте в кавычки)
@@ -193,33 +203,32 @@ Cоздание пустого файла с заданным именем.
 
 ## Примеры:
 * Заменить во всём файле
-`awk-f replace.awk "старое" "новое" file.txt`
+`replace "старое" "новое" file.txt`
 
 * Заменить во всём файле и записать в другой файл
-`awk-f replace.awk "старое" "новое" file.txt output.txt`
+`replace "старое" "новое" file.txt output.txt`
 
 * Заменить только в строке 5
-`awk-f replace.awk "старое" "новое" 5 file.txt`
+`replace "старое" "новое" 5 file.txt`
 
 * Заменить в строках с 5 по 10
-`awk-f replace.awk "старое" "новое" 5 10 file.txt`
+`replace "старое" "новое" 5 10 file.txt`
 
 * Заменить в строках с 5 по 10 и записать в output.txt
-`awk-f replace.awk "старое" "новое" 5 10 file.txt output.txt`
+`replace "старое" "новое" 5 10 file.txt output.txt`
 
 * Удалить подстроку только в строках 1-3
-`awk-f replace.awk "удалить" "" 1 3 file.txt`
+`replace "удалить" "" 1 3 file.txt`
 
 ---
 
 #replace-m
 Поиск и замена многострочных блоков в файле.
 old и new — многострочные блоки текста, читаемые из файлов.
-Использование без диапазона: `awk-f replace-m.awk old.txt new.txt file.txt [outfile.txt]`
-Использование с диапазоном: `awk-f replace-m.awk old.txt new.txt start [end] file.txt [outfile.txt]`
-Через обертку replace-m.bat:
-`replace-m old.txt new.txt file.txt [outfile.txt]`
-`replace-m old.txt new.txt start [end] file.txt [outfile.txt]`
+Использование без диапазона: `replace-m old.txt new.txt file.txt [outfile.txt]`
+`awk-f replace-m.awk old.txt new.txt file.txt [outfile.txt]`
+Использование с диапазоном: `replace-m old.txt new.txt start [end] file.txt [outfile.txt]`
+`awk-f replace-m.awk old.txt new.txt start [end] file.txt [outfile.txt]`
 
 ## Параметры:
 - old.txt — файл с искомым блоком
@@ -231,25 +240,29 @@ old и new — многострочные блоки текста, читаем�
 
 ## Примеры:
 * Заменить блок из old.txt на блок из new.txt во всём файле
-awk-f replace-block.awk old.txt new.txt file.txt
+`replace-block old.txt new.txt file.txt
 
 * Заменить и записать в другой файл
-awk-f replace-block.awk old.txt new.txt file.txt output.txt
+`replace-block old.txt new.txt file.txt output.txt`
 
 * Заменить блок только если он начинается в строках с 10 по 20
-awk-f replace-block.awk old.txt new.txt 10 20 file.txt
+`replace-block old.txt new.txt 10 20 file.txt`
 
 * Заменить блок, только если он начинается точно в строке 5
-awk-f replace-block.awk old.txt new.txt 5 file.txt
+`replace-block old.txt new.txt 5 file.txt`
 
 * Удалить блок (new.txt пустой файл)
-awk-f replace-block.awk old.txt empty.txt file.txt
+`replace-block old.txt empty.txt file.txt`
 
 ---
 ---
 
+awk/ - локальная (portable) версия awk.exe
 scrs/ - папка awk-скриптов
+cmd-ps/ - запуск командных оболочек Windows из текущей папки
+mass/ - массовые операции: обход дерева каталогов
 
+---
 
 AWK:
 `print "текст" > "output.txt"`    # перезапись файла

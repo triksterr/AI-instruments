@@ -1,1 +1,1 @@
-@%~dp0awk-f %~dp0replace-m.awk %*
+@%~dp0scrs/awk-f %~dp0replace-m.awk %*

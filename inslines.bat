@@ -1,1 +1,1 @@
-@%~dp0awk-f %~dp0scrs/inslines.awk %*
+@%~dp0scrs/awk-f %~dp0scrs/inslines.awk %*

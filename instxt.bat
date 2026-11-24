@@ -1,1 +1,1 @@
-@%~dp0awk-f %~dp0scrs/instxt.awk %*
+@%~dp0scrs/awk-f %~dp0scrs/instxt.awk %*
