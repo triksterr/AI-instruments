@@ -1,9 +1,7 @@
 # Поиск и замена многострочных блоков в файле.
 # old и new — многострочные блоки текста, читаемые из файлов.
-#
 # Использование без диапазона: awk-f replace-m.awk old.txt new.txt file.txt [outfile.txt]
 # Использование с диапазоном: awk-f replace-m.awk old.txt new.txt start [end] file.txt [outfile.txt]
-# 
 # old.txt — файл с искомым блоком
 # new.txt — файл с новым блоком (пустой файл = удаление блока)
 # start — начальная строка диапазона (от 1). Замена происходит, если ПЕРВАЯ строка блока находится в пределах [start, end].
@@ -26,7 +24,7 @@ BEGIN {
     # Читаем old.txt в массив
     old_count = 0
     while ((getline line < old_file) > 0) {
-        sub(/\r$/, "", line)  # Удаляем \r для корректной работы с CRLF
+        sub(/\r$/, "", line)
         old_count++
         old_lines[old_count] = line
     }
@@ -46,72 +44,44 @@ BEGIN {
     }
     close(new_file)
     
-    # Определяем параметры диапазона и outfile (аналогично replace.awk)
+    # Определяем параметры диапазона
     if (ARGV[1] ~ /^[0-9]+$/) {
         start = ARGV[1] + 0
         delete ARGV[1]
-        
         if (start < 1) {
             print "Ошибка: start должен быть >= 1" > "/dev/stderr"
             exit 1
         }
-        
-        if (ARGV[2] ~ /^[0-9]+$/) {
-            end = ARGV[2] + 0
-            delete ARGV[2]
+        if (ARGV[1] ~ /^[0-9]+$/) {
+            end = ARGV[1] + 0
+            delete ARGV[1]
         } else {
             end = start
-        }
-        
-        input_file = ARGV[1]
-        
-        if (length(ARGV) >= 3) {
-            outfile = ARGV[2]
-            delete ARGV[2]
-            in_place = 0
-        } else {
-            in_place = 1
-            temp_dir = ENVIRON["TEMP"]
-            if (temp_dir == "") temp_dir = ENVIRON["TMP"]
-            if (temp_dir == "") {
-                print "Ошибка: не найдена переменная окружения TEMP/TMP" > "/dev/stderr"
-                exit 1
-            }
-            outfile = temp_dir "\\awk_temp_" PROCINFO["pid"] ".tmp"
         }
     } else {
         start = 1
         end = 2147483647
-        
-        input_file = ARGV[1]
-        
-        if (length(ARGV) >= 3) {
-            outfile = ARGV[2]
-            delete ARGV[2]
-            in_place = 0
-        } else {
-            in_place = 1
-            temp_dir = ENVIRON["TEMP"]
-            if (temp_dir == "") temp_dir = ENVIRON["TMP"]
-            if (temp_dir == "") {
-                print "Ошибка: не найдена переменная окружения TEMP/TMP" > "/dev/stderr"
-                exit 1
-            }
-            outfile = temp_dir "\\awk_temp_" PROCINFO["pid"] ".tmp"
-        }
     }
     
-    printf "" > outfile
-}
-
-{
-    line = $0
-    sub(/\r$/, "", line)
-    file_count = NR
-    file_lines[NR] = line
-}
-
-END {
+    # Определяем input_file и target
+    input_file = ARGV[1]
+    if (length(ARGV) >= 3) {
+        target = ARGV[2]
+        delete ARGV[2]
+    } else {
+        target = input_file
+    }
+    
+    # Читаем весь файл в массив
+    file_count = 0
+    while ((getline line < input_file) > 0) {
+        sub(/\r$/, "", line)
+        file_count++
+        file_lines[file_count] = line
+    }
+    close(input_file)
+    
+    # Обрабатываем и записываем результат напрямую в target
     i = 1
     while (i <= file_count) {
         # Проверяем, начинается ли потенциальный блок в допустимом диапазоне
@@ -132,7 +102,7 @@ END {
             if (match_found) {
                 # Выводим new_lines вместо old
                 for (j = 1; j <= new_count; j++) {
-                    print new_lines[j] > outfile
+                    print new_lines[j] > target
                 }
                 i += old_count
                 continue
@@ -140,17 +110,9 @@ END {
         }
         
         # Не совпало или вне диапазона — выводим исходную строку
-        print file_lines[i] > outfile
+        print file_lines[i] > target
         i++
     }
-    
-    if (in_place) {
-        close(outfile)
-        cmd = "move /Y \"" outfile "\" \"" input_file "\" >nul 2>&1"
-        result = system(cmd)
-        if (result != 0) {
-            print "Ошибка: не удалось заменить исходный файл" > "/dev/stderr"
-            exit 1
-        }
-    }
+    close(target)
+    exit 0
 }

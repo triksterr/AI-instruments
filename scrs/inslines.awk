@@ -26,69 +26,53 @@ BEGIN {
     # Читаем block.txt в массив
     block_count = 0
     while ((getline line < block_file) > 0) {
-        sub(/\r$/, "", line)  # Удаляем \r для корректной работы с CRLF
+        sub(/\r$/, "", line)
         block_count++
         block_lines[block_count] = line
     }
     close(block_file)
     
-    # Сохраняем имя входного файла
+    # Определяем input_file и target
     input_file = ARGV[1]
-    
-    # outfile, если есть
     if (length(ARGV) >= 3) {
-        outfile = ARGV[2]
+        target = ARGV[2]
         delete ARGV[2]
-        in_place = 0
     } else {
-        in_place = 1
-        temp_dir = ENVIRON["TEMP"]
-        if (temp_dir == "") temp_dir = ENVIRON["TMP"]
-        if (temp_dir == "") {
-            print "Ошибка: не найдена переменная окружения TEMP/TMP" > "/dev/stderr"
-            exit 1
+        target = input_file
+    }
+    
+    # Читаем весь входной файл в массив
+    file_count = 0
+    while ((getline line < input_file) > 0) {
+        sub(/\r$/, "", line)
+        file_count++
+        file_lines[file_count] = line
+    }
+    close(input_file)
+    
+    # Корректируем line_num, если он больше числа строк
+    if (line_num > file_count + 1) {
+        line_num = file_count + 1
+    }
+    
+    # Записываем результат напрямую в target
+    for (i = 1; i <= file_count; i++) {
+        if (i == line_num) {
+            # Вставляем блок перед этой строкой
+            for (j = 1; j <= block_count; j++) {
+                print block_lines[j] > target
+            }
         }
-        outfile = temp_dir "\\awk_temp_" PROCINFO["pid"] ".tmp"
+        print file_lines[i] > target
     }
     
-    # Создаём пустой временный файл (на случай, если исходный файл пустой)
-    printf "" > outfile
-    
-    inserted = 0
-}
-
-function out(s) {
-    print s > outfile
-}
-
-function out_block() {
-    for (i = 1; i <= block_count; i++) {
-        out(block_lines[i])
-    }
-}
-
-NR == line_num {
-    out_block()
-    inserted = 1
-}
-
-{
-    out($0)
-}
-
-END {
-    # Если номер строки был больше числа строк — добавляем в конец
-    if (inserted == 0) {
-        out_block()
-    }
-    
-    if (in_place) {
-        close(outfile)
-        cmd = "move /Y \"" outfile "\" \"" input_file "\" >nul 2>&1"
-        result = system(cmd)
-        if (result != 0) {
-            print "Ошибка: не удалось заменить исходный файл" > "/dev/stderr"
-            exit 1
+    # Если line_num был больше числа строк — вставляем блок в конец
+    if (line_num > file_count) {
+        for (j = 1; j <= block_count; j++) {
+            print block_lines[j] > target
         }
     }
+    
+    close(target)
+    exit 0
 }

@@ -1,6 +1,7 @@
 # Вставка текста в строку
 # Использование: awk-f instxt.awk line_num pos text file.txt [outfile]
-# Вставляет text ВНУТРЬ строки line_num на позицию pos (символы сдвигаются). Если pos больше длины строки — вставка в конец строки
+# Вставляет text ВНУТРЬ строки line_num на позицию pos (символы сдвигаются)
+# Если pos больше длины строки — вставка в конец строки
 # line_num — номер строки (от 1). Если line_num больше числа строк — добавляется новая строка в конец файла
 # pos — позиция вставки (от 1). Если pos больше длины строки — вставка в конец строки
 # text — текст для вставки (если содержит пробелы, заключайте в кавычки)
@@ -29,61 +30,47 @@ BEGIN {
     delete ARGV[2]
     delete ARGV[3]
     
-    # Сохраняем имя входного файла
+    # Определяем input_file и target
     input_file = ARGV[1]
-    
-    # outfile, если есть
     if (length(ARGV) >= 3) {
-        outfile = ARGV[2]
+        target = ARGV[2]
         delete ARGV[2]
-        in_place = 0
     } else {
-        in_place = 1
-        temp_dir = ENVIRON["TEMP"]
-        if (temp_dir == "") temp_dir = ENVIRON["TMP"]
-        if (temp_dir == "") {
-            print "Ошибка: не найдена переменная окружения TEMP/TMP" > "/dev/stderr"
-            exit 1
-        }
-        outfile = temp_dir "\\awk_temp_" PROCINFO["pid"] ".tmp"
+        target = input_file
     }
     
-    line_found = 0
-}
-
-function out(s) {
-    print s > outfile
-}
-
-NR == line_num {
-    line_found = 1
-    line_len = length($0)
-    if (pos > line_len) {
-        # Вставка в конец строки
-        out($0 text)
-    } else {
-        out(substr($0, 1, pos - 1) text substr($0, pos))
+    # Читаем весь входной файл в массив
+    file_count = 0
+    while ((getline line < input_file) > 0) {
+        sub(/\r$/, "", line)
+        file_count++
+        file_lines[file_count] = line
     }
-    next
-}
-
-{
-    out($0)
-}
-
-END {
-    # Если номер строки был больше числа строк — добавляем новую строку в конец
-    if (line_found == 0) {
-        out(text)
-    }
+    close(input_file)
     
-    if (in_place) {
-        close(outfile)
-        cmd = "move /Y \"" outfile "\" \"" input_file "\" >nul 2>&1"
-        result = system(cmd)
-        if (result != 0) {
-            print "Ошибка: не удалось заменить исходный файл" > "/dev/stderr"
-            exit 1
+    # Определяем, что делать
+    if (line_num > file_count) {
+        # Добавляем новую строку в конец файла
+        file_count++
+        file_lines[file_count] = text
+        line_found = 0
+    } else {
+        # Модифицируем существующую строку
+        line_found = 1
+        line_len = length(file_lines[line_num])
+        if (pos > line_len) {
+            # Вставка в конец строки
+            file_lines[line_num] = file_lines[line_num] text
+        } else {
+            # Вставка в середину строки
+            file_lines[line_num] = substr(file_lines[line_num], 1, pos - 1) text substr(file_lines[line_num], pos)
         }
     }
+    
+    # Записываем результат напрямую в target
+    for (i = 1; i <= file_count; i++) {
+        print file_lines[i] > target
+    }
+    close(target)
+    exit 0
 }
