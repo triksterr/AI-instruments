@@ -1,4 +1,5 @@
 # test-awk-scripts.ps1
+# Для запуска скопировать файл в корневую папку проекта
 $ErrorActionPreference = "Stop"
 $scriptDir = "C:\Users\Alex\Documents\prog\awk"
 $testDir = Join-Path $scriptDir "test_temp"
