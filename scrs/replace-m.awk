@@ -15,11 +15,9 @@ BEGIN {
         exit 1
     }
     
+    # 1. Читаем имена файлов блоков (всегда ARGV[1] и ARGV[2])
     old_file = ARGV[1]
     new_file = ARGV[2]
-    
-    delete ARGV[1]
-    delete ARGV[2]
     
     # Читаем old.txt в массив
     old_count = 0
@@ -44,35 +42,53 @@ BEGIN {
     }
     close(new_file)
     
-    # Определяем параметры диапазона
-    if (ARGV[1] ~ /^[0-9]+$/) {
-        start = ARGV[1] + 0
-        delete ARGV[1]
+    # 2. Разбираем оставшиеся аргументы: start [end] file.txt [outfile.txt]
+    # Проверяем, является ли ARGV[3] числом (начало диапазона)
+    if (ARGV[3] ~ /^[0-9]+$/) {
+        # Режим с диапазоном
+        start = ARGV[3] + 0
         if (start < 1) {
             print "Ошибка: start должен быть >= 1" > "/dev/stderr"
             exit 1
         }
-        if (ARGV[1] ~ /^[0-9]+$/) {
-            end = ARGV[1] + 0
-            delete ARGV[1]
+        
+        if (ARGV[4] ~ /^[0-9]+$/) {
+            # end задан
+            end = ARGV[4] + 0
+            input_file = ARGV[5]
+            if (length(ARGV) >= 7) {
+                target = ARGV[6]
+            } else {
+                target = input_file
+            }
         } else {
+            # end не задан
             end = start
+            input_file = ARGV[4]
+            if (length(ARGV) >= 6) {
+                target = ARGV[5]
+            } else {
+                target = input_file
+            }
         }
     } else {
+        # Режим без диапазона
         start = 1
         end = 2147483647
+        input_file = ARGV[3]
+        if (length(ARGV) >= 5) {
+            target = ARGV[4]
+        } else {
+            target = input_file
+        }
     }
     
-    # Определяем input_file и target
-    input_file = ARGV[1]
-    if (length(ARGV) >= 3) {
-        target = ARGV[2]
-        delete ARGV[2]
-    } else {
-        target = input_file
+    if (input_file == "") {
+        print "Ошибка: не указано имя входного файла" > "/dev/stderr"
+        exit 1
     }
     
-    # Читаем весь файл в массив
+    # 3. Читаем весь входной файл в массив
     file_count = 0
     while ((getline line < input_file) > 0) {
         sub(/\r$/, "", line)
@@ -81,7 +97,7 @@ BEGIN {
     }
     close(input_file)
     
-    # Обрабатываем и записываем результат напрямую в target
+    # 4. Обрабатываем и записываем результат напрямую в target
     i = 1
     while (i <= file_count) {
         # Проверяем, начинается ли потенциальный блок в допустимом диапазоне
@@ -113,6 +129,7 @@ BEGIN {
         print file_lines[i] > target
         i++
     }
+    
     close(target)
     exit 0
 }

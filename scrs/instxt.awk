@@ -13,6 +13,7 @@ BEGIN {
         exit 1
     }
     
+    # 1. Читаем все аргументы по их исходным индексам
     line_num = ARGV[1] + 0
     pos = ARGV[2] + 0
     text = ARGV[3]
@@ -26,20 +27,16 @@ BEGIN {
         exit 1
     }
     
-    delete ARGV[1]
-    delete ARGV[2]
-    delete ARGV[3]
+    # 2. Определяем input_file и target (без delete ARGV)
+    input_file = ARGV[4]
     
-    # Определяем input_file и target
-    input_file = ARGV[1]
-    if (length(ARGV) >= 3) {
-        target = ARGV[2]
-        delete ARGV[2]
+    if (length(ARGV) >= 6) {
+        target = ARGV[5]
     } else {
         target = input_file
     }
     
-    # Читаем весь входной файл в массив
+    # 3. Читаем весь входной файл в массив
     file_count = 0
     while ((getline line < input_file) > 0) {
         sub(/\r$/, "", line)
@@ -48,15 +45,13 @@ BEGIN {
     }
     close(input_file)
     
-    # Определяем, что делать
+    # 4. Определяем, что делать
     if (line_num > file_count) {
         # Добавляем новую строку в конец файла
         file_count++
         file_lines[file_count] = text
-        line_found = 0
     } else {
         # Модифицируем существующую строку
-        line_found = 1
         line_len = length(file_lines[line_num])
         if (pos > line_len) {
             # Вставка в конец строки
@@ -67,10 +62,11 @@ BEGIN {
         }
     }
     
-    # Записываем результат напрямую в target
+    # 5. Записываем результат напрямую в target
     for (i = 1; i <= file_count; i++) {
         print file_lines[i] > target
     }
     close(target)
+    
     exit 0
 }

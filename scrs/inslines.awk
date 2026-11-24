@@ -12,18 +12,24 @@ BEGIN {
         exit 1
     }
     
+    # 1. Читаем все аргументы по их исходным индексам
     line_num = ARGV[1] + 0
     block_file = ARGV[2]
+    input_file = ARGV[3]
     
     if (line_num < 1) {
         print "Ошибка: line_num должен быть >= 1" > "/dev/stderr"
         exit 1
     }
     
-    delete ARGV[1]
-    delete ARGV[2]
+    # 2. Определяем target
+    if (length(ARGV) >= 5) {
+        target = ARGV[4]
+    } else {
+        target = input_file
+    }
     
-    # Читаем block.txt в массив
+    # 3. Читаем block.txt в массив
     block_count = 0
     while ((getline line < block_file) > 0) {
         sub(/\r$/, "", line)
@@ -32,16 +38,7 @@ BEGIN {
     }
     close(block_file)
     
-    # Определяем input_file и target
-    input_file = ARGV[1]
-    if (length(ARGV) >= 3) {
-        target = ARGV[2]
-        delete ARGV[2]
-    } else {
-        target = input_file
-    }
-    
-    # Читаем весь входной файл в массив
+    # 4. Читаем весь входной файл в массив
     file_count = 0
     while ((getline line < input_file) > 0) {
         sub(/\r$/, "", line)
@@ -50,12 +47,12 @@ BEGIN {
     }
     close(input_file)
     
-    # Корректируем line_num, если он больше числа строк
+    # 5. Корректируем line_num, если он больше числа строк
     if (line_num > file_count + 1) {
         line_num = file_count + 1
     }
     
-    # Записываем результат напрямую в target
+    # 6. Записываем результат напрямую в target
     for (i = 1; i <= file_count; i++) {
         if (i == line_num) {
             # Вставляем блок перед этой строкой
