@@ -1,0 +1,1 @@
+@%~dp0awk-f %~dp0scrs/addfile.awk %*
