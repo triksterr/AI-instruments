@@ -1,5 +1,5 @@
 # Склейка двух текстовых файлов в один с сохранением переводов строк.
-# Использование: awk-f addfile.awk one two [outfile]
+# Использование: addfile one two [outfile]
 # one — исходный файл (к которому добавляем)
 # two — файл, содержимое которого добавляется в конец
 # outfile — необязательный, если не задан — модификация one in-place
@@ -11,20 +11,24 @@ BEGIN {
         exit 1
     }
     
+    # 1. Сначала сохраняем ВСЕ аргументы в переменные
     file_one = ARGV[1]
     file_two = ARGV[2]
     
-    delete ARGV[1]
-    delete ARGV[2]
-    
-    # Определяем целевой файл
-    if (length(ARGV) >= 2) {
-        target = ARGV[1]
+    if (length(ARGV) >= 4) {
+        outfile = ARGV[3]
+        in_place = 0
     } else {
-        target = file_one
+        outfile = file_one
+        in_place = 1
     }
     
-    # Читаем оба файла как единое целое (сохраняем точную структуру)
+    # 2. Удаляем аргументы из ARGV, чтобы AWK не пытался открыть их как файлы для построчного чтения
+    delete ARGV[1]
+    delete ARGV[2]
+    if (length(ARGV) >= 4) delete ARGV[3]
+    
+    # 3. Читаем оба файла как единое целое (сохраняем точную структуру переводов строк)
     RS = "^$"
     
     content_one = ""
@@ -37,9 +41,10 @@ BEGIN {
     }
     close(file_two)
     
-    # Записываем результат в целевой файл
-    printf "%s%s", content_one, content_two > target
-    close(target)
+    # 4. Записываем результат напрямую в целевой файл
+    # Так как исходные файлы уже прочитаны и закрыты, перезапись file_one (при in_place) абсолютно безопасна
+    printf "%s%s", content_one, content_two > outfile
+    close(outfile)
     
     exit 0
 }
